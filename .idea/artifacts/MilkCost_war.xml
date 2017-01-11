@@ -1,8 +1,0 @@
-<component name="ArtifactManager">
-  <artifact type="war" name="MilkCost:war">
-    <output-path>$PROJECT_DIR$/target</output-path>
-    <root id="archive" name="MilkCostMVC-1.0.war">
-      <element id="artifact" artifact-name="MilkCost:war exploded" />
-    </root>
-  </artifact>
-</component>
