@@ -46,6 +46,8 @@ public class Cost {
         Cost cost = (Cost) o;
 
         //if (Double.compare(cost.sum, sum) != 0) return false;
+        //need for equals Set of costs (adding sum for equals items)
+
         return item != null ? item.equals(cost.item) : cost.item == null;
     }
 
