@@ -1,150 +1,75 @@
 package ua.nick.milkcost.model;
 
-import javax.persistence.*;
-import java.util.Date;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+import java.time.YearMonth;
+import java.util.Set;
 
 @Entity
 @Table(name = "costs")
 public class CostStructure {
 
-    private Long id;
+    private YearMonth period;
+    //http://stackoverflow.com/questions/23800477/java-8-time-api-how-to-parse-string-of-format-mm-yyyy-to-localdate
 
-    private Date monthYear;
+    private TypeCosts type;
 
-    private double costGas;
-    private double costRepairs;
-    private double costMaterials;
-    private double costOther;
-    private double costFood;
-    private double costElecticity;
-    private double costSalary;
-    private double costPayrollTax;
-    private double costAmortization;
-    private double costServices;
-
-    private TypeCost typeCost;
+    //one to many
+    private Set<Cost> costs;
 
     public CostStructure() {
     }
 
-    public CostStructure(Date monthYear, double costGas, double costRepairs, double costMaterials, double costOther, double costFood, double costElecticity, double costSalary, double costPayrollTax, double costAmortization, double costServices, TypeCost typeCost) {
-        this.monthYear = monthYear;
-        this.costGas = costGas;
-        this.costRepairs = costRepairs;
-        this.costMaterials = costMaterials;
-        this.costOther = costOther;
-        this.costFood = costFood;
-        this.costElecticity = costElecticity;
-        this.costSalary = costSalary;
-        this.costPayrollTax = costPayrollTax;
-        this.costAmortization = costAmortization;
-        this.costServices = costServices;
-        this.typeCost = typeCost;
+    public CostStructure(TypeCosts type) {
+        this.type = type;
     }
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    public Long getId() {
-        return id;
+    public CostStructure(YearMonth mmYYYY, TypeCosts type) {
+        this.period = mmYYYY;
+        this.type = type;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public CostStructure(Set<Cost> costs) {
+        this.costs = costs;
     }
 
-    public Date getMonthYear() {
-        return monthYear;
+    public CostStructure(YearMonth mmYYYY, TypeCosts type, Set<Cost> costs) {
+        this.period = mmYYYY;
+        this.type = type;
+        this.costs = costs;
     }
 
-    public void setMonthYear(Date monthYear) {
-        this.monthYear = monthYear;
+    public YearMonth getPeriod() {
+        return period;
     }
 
-    public double getCostGas() {
-        return costGas;
+    public void setPeriod(YearMonth period) {
+        this.period = period;
     }
 
-    public void setCostGas(double costGas) {
-        this.costGas = costGas;
+    public TypeCosts getType() {
+        return type;
     }
 
-    public double getCostRepairs() {
-        return costRepairs;
+    public void setType(TypeCosts type) {
+        this.type = type;
     }
 
-    public void setCostRepairs(double costRepairs) {
-        this.costRepairs = costRepairs;
+    public Set<Cost> getCosts() {
+        return costs;
     }
 
-    public double getCostMaterials() {
-        return costMaterials;
+    public void setCosts(Set<Cost> costs) {
+        this.costs = costs;
     }
 
-    public void setCostMaterials(double costMaterials) {
-        this.costMaterials = costMaterials;
-    }
-
-    public double getCostOther() {
-        return costOther;
-    }
-
-    public void setCostOther(double costOther) {
-        this.costOther = costOther;
-    }
-
-    public double getCostFood() {
-        return costFood;
-    }
-
-    public void setCostFood(double costFood) {
-        this.costFood = costFood;
-    }
-
-    public double getCostElecticity() {
-        return costElecticity;
-    }
-
-    public void setCostElecticity(double costElecticity) {
-        this.costElecticity = costElecticity;
-    }
-
-    public double getCostSalary() {
-        return costSalary;
-    }
-
-    public void setCostSalary(double costSalary) {
-        this.costSalary = costSalary;
-    }
-
-    public double getCostPayrollTax() {
-        return costPayrollTax;
-    }
-
-    public void setCostPayrollTax(double costPayrollTax) {
-        this.costPayrollTax = costPayrollTax;
-    }
-
-    public double getCostAmortization() {
-        return costAmortization;
-    }
-
-    public void setCostAmortization(double costAmortization) {
-        this.costAmortization = costAmortization;
-    }
-
-    public double getCostServices() {
-        return costServices;
-    }
-
-    public void setCostServices(double costServices) {
-        this.costServices = costServices;
-    }
-
-    public TypeCost getTypeCost() {
-        return typeCost;
-    }
-
-    public void setTypeCost(TypeCost typeCost) {
-        this.typeCost = typeCost;
+    public boolean addCost(Cost newCost) {
+        for (Cost cost : costs) {
+            if (newCost.getItem().equals(cost.getItem())) {
+                cost.setSum(cost.getSum() + newCost.getSum());
+                return true;
+            }
+        }
+        return costs.add(newCost);
     }
 }

@@ -7,8 +7,8 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import ua.nick.milkcost.model.CostStructure;
-import ua.nick.milkcost.model.TypeCost;
-import ua.nick.milkcost.service.UserService;
+import ua.nick.milkcost.model.TypeCosts;
+import ua.nick.milkcost.service.CostService;
 
 import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
@@ -21,18 +21,7 @@ import java.util.Date;
 public class ApplicationController {
 
     @Autowired
-    UserService userService;
-
-    @RequestMapping(value = "/login", method = RequestMethod.GET)
-    public String login(Model model, String error, String logout) {
-        if (error != null)
-            model.addAttribute("error", "Your userphone or password is invalid.");
-
-        if (logout != null)
-            model.addAttribute("message", "You have been logged out successfully.");
-
-        return "login";
-    }
+    CostService costService;
 
     @RequestMapping(value = {"/", "/welcome"}, method = RequestMethod.GET)
     public String welcome(@ModelAttribute("message") String message, Model model, Principal principal) {
@@ -48,16 +37,12 @@ public class ApplicationController {
     @RequestMapping(value = "/costs/add", method = RequestMethod.GET)
     public String addNewCosts(@ModelAttribute("message") String message, Model model, Principal principal) {
 
-        CostStructure costStructure = null;
-        try {
-            costStructure = userService.createNewCostStructure();
-        } catch (ParseException e) {
-            model.addAttribute("message", "Costs added error");
-            return "welcome";
-        }
+        costService.createCostStructures();
 
-        CostStructure newCostStructure = userService.saveNewCostStructure(costStructure);
-        model.addAttribute("message", "Costs " + newCostStructure.getMonthYear() + " was added");
+        //CostStructure newCostStructure = userService.saveNewCostStructure(costStructure);
+        //todo replace this operation to updateCostStructure() in userService
+
+        //model.addAttribute("message", "Costs " + newCostStructure.getMonthYear() + " was added");
 
         return "welcome";
     }
@@ -66,9 +51,9 @@ public class ApplicationController {
     public String getCosts(Model model, HttpServletRequest req) {
 
         String typeCostStr = req.getParameter("type");
-        TypeCost typeCost = typeCostStr.equals("TOTAL") ? TypeCost.TOTAL :
-                        typeCostStr.equals("OVERHEAD") ? TypeCost.OVERHEAD :
-                        typeCostStr.equals("DIRECT") ? TypeCost.DIRECT : null ;
+        TypeCosts typeCost = typeCostStr.equals("TOTAL") ? TypeCosts.TOTAL :
+                typeCostStr.equals("OVERHEAD") ? TypeCosts.OVERHEAD :
+                        typeCostStr.equals("DIRECT") ? TypeCosts.DIRECT : null ;
 
         String dateMonthYear = "2016-10";
         DateFormat df = new SimpleDateFormat("yyyy-MM");
@@ -80,7 +65,7 @@ public class ApplicationController {
             return "welcome";
         }
 
-        CostStructure costStructure = userService.getCostStructure(typeCost, date);
+        CostStructure costStructure = costService.getCostStructure(typeCost, date);
         model.addAttribute("costStructure", costStructure);
 
         return "costs";

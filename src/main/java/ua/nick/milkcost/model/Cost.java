@@ -1,123 +1,61 @@
 package ua.nick.milkcost.model;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-
 public class Cost {
 
-    private Date month;
+    //private YearMonth period;
+    //http://stackoverflow.com/questions/23800477/java-8-time-api-how-to-parse-string-of-format-mm-yyyy-to-localdate
 
-    private double costDirect;
-    private double costOverhead;
-    private double costAdditional;
-    private double costAdmin;
-
-    private Map<String, Double> costStructure;
+    //private CostType type;
+    private String item;
+    private double sum;
 
     public Cost() {
-        this.costStructure = new HashMap<>();
     }
 
-    public Cost(Map<String, Double> costDirectStructure,
-                Map<String, Double> costOverheadStructure,
-                Map<String, Double> costAdditionalStructure) {
-        for (Double value : costDirectStructure.values()) {
-            this.costDirect += value;
-        }
-        for (Double value : costOverheadStructure.values()) {
-            this.costOverhead += value;
-        }
-        this.costAdmin = costAdditionalStructure.remove("ADMIN") +
-                costAdditionalStructure.remove("K2_ADMIN_KV");
+    //type is in structures only?
+    /*public Cost(CostType type) {
+        type = type;
+    }*/
 
-        for (Double value : costAdditionalStructure.values()) {
-            this.costAdditional += value;
-        }
-        this.costStructure = createCostStructure(
-                costDirectStructure, costOverheadStructure,
-                costAdditionalStructure);
+    public Cost(String item, double sum) {
+        this.item = item;
+        this.sum = sum;
     }
 
-    public Date getMonth() {
-        return month;
+    public String getItem() {
+        return item;
     }
 
-    public void setMonth(Date month) {
-        this.month = month;
+    public void setItem(String item) {
+        this.item = item;
     }
 
-    public double getCostDirect() {
-        return costDirect;
+    public double getSum() {
+        return sum;
     }
 
-    public void setCostDirect(Map<String, Double> costDirectStructure) {
-        for (Double value : costDirectStructure.values()) {
-            this.costDirect += value;
-        }
+    public void setSum(double sum) {
+        this.sum = sum;
     }
 
-    public double getCostOverhead() {
-        return costOverhead;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Cost cost = (Cost) o;
+
+        //if (Double.compare(cost.sum, sum) != 0) return false;
+        return item != null ? item.equals(cost.item) : cost.item == null;
     }
 
-    public void setCostOverhead(Map<String, Double> costOverheadStructure) {
-        for (Double value : costOverheadStructure.values()) {
-            this.costOverhead += value;
-        }
-    }
-
-    public double getCostAdditional() {
-        return costAdditional;
-    }
-
-    public void setCostAdditional(Map<String, Double> costAdditionalStructure) {
-        for (Double value : costAdditionalStructure.values()) {
-            this.costAdditional += value;
-        }
-    }
-
-    public Map<String, Double> getCostStructure() {
-        return costStructure;
-    }
-
-    public void setCostStructure(Map<String, Double> costDirectStructure,
-                                 Map<String, Double> costOverheadStructure,
-                                 Map<String, Double> costAdditionalStructure) {
-
-        this.costStructure = createCostStructure(
-                costDirectStructure, costOverheadStructure,
-                costAdditionalStructure);
-    }
-
-    public double getCostTotal() {
-        return costDirect + costOverhead + costAdditional + costAdmin;
-    }
-
-    public double getCostAdmin() {
-        return costAdmin;
-    }
-
-    public void setCostAdmin(double costAdmin) {
-        this.costAdmin = costAdmin;
-    }
-
-    private Map<String, Double> createCostStructure(Map<String, Double> costDirectStructure,
-                                                    Map<String, Double> costOverheadStructure,
-                                                    Map<String, Double> costAdditionalStructure) {
-        for (String key : costOverheadStructure.keySet()) {
-            Double value = costDirectStructure.get(key);
-            value = value != null ?
-                    value + costOverheadStructure.get(key) : costOverheadStructure.get(key);
-            costDirectStructure.put(key, value);
-        }
-        for (String key : costAdditionalStructure.keySet()) {
-            Double value = costDirectStructure.get(key);
-            value = value != null ?
-                    value + costAdditionalStructure.get(key) : costAdditionalStructure.get(key);
-            costDirectStructure.put(key, value);
-        }
-
-        return costDirectStructure;
+    @Override
+    public int hashCode() {
+        int result;
+        long temp;
+        result = item != null ? item.hashCode() : 0;
+        temp = Double.doubleToLongBits(sum);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        return result;
     }
 }
