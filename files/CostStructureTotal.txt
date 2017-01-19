@@ -1,0 +1,75 @@
+public class CostStructureTotal extends CostStructure {
+
+	CostStructure[] costStructures;
+
+	public CostStructureTotal(CostStructure... args) {
+        this.period = args[0].getPeriod();
+		this.type = TypeCosts.TOTAL;
+		fileNamePath = "";
+		this.accounts = accounts;
+		this.costStructures = Arrays.copyOf(args); //or = args; ?
+		this.costs = createSetCosts();
+    }
+	
+	/*
+	private CostStructure[] createCostStructures(CostStructure... args) {
+		CostStructure[] costStructures = new CostStructures[args.length];
+		for (int i = 0; i < args.length; i++)
+			costStructures[i] = args[i];
+		
+		return costStructures;
+	}
+	*/
+	
+	public Set<String> createSetCosts() {
+		Set<Cost> costs = new HashSet<>(costStructures[0]);
+		for (int i = 1; i < costStructures.length; i++) {
+            Set<Cost> subCosts = costStructures[i].getCosts();
+            mergeCostSets(costs, subCosts);
+        }            
+	}	
+	
+	private Set<Cost> mergeCostSets(Set<Cost> costs, Set<Cost> addCosts) {
+
+        int size1 = costs.size();
+        int size2 = addCosts.size();
+
+        if (size1 > 0 && size2 == 0)
+            return costs;
+
+        if (size1 == 0 && size2 > 0)
+            return addCosts;
+
+        Set<Cost> mergedCosts = new HashSet<>(costs);
+		Set<Cost> addCostsCopy = new HashSet<>(addCosts);
+
+        if (size1 > 0 && size2 > 0)
+			mergedCosts = additionCostSets(mergedCosts, addCostsCopy);
+
+        return mergedCosts;
+    }
+	
+	private Set<Cost> additionCostSets(Set<Cost> costs, Set<Cost> addCosts) {
+				
+		for (Cost cost1 : costs) {
+            String name = cost1.getItem();
+				
+			Iterator<Cost> iterator = addCosts.iterator();
+			boolean stopIterator = false;
+				
+			while (!stopIterator && addCosts.size() > 0 && iterator.hasNext()) {
+				Cost cost2 = iterator.next();
+				if (name.equals(cost2.getItem())) {
+					cost1.addSum(cost2.getSum());
+					addCosts.remove(cost2);
+					stopIterator = true;
+				}
+			}	
+        }
+		
+		if (addCosts.size() > 0)
+				costs.addAll(addCosts);	    
+
+        return costs;
+    }	
+}

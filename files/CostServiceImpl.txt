@@ -1,0 +1,63 @@
+@Service(value = "service")
+public class CostServiceImpl implements CostService {
+
+    @Autowired
+    private CostStructureRepository costStructureRepository;
+	
+	private CostStructureFactory factory;
+
+    public CostServiceImpl() {
+		this.factory = new CostStructureFactory();
+    }
+
+    @Override
+    public void createCostStructures() {
+		
+		CostStructure costsDirect = factory.createNewCostStructure(TypeCosts.DIRECT);
+		CostStructure costsOverhead = factory.createNewCostStructure(TypeCosts.OVERHEAD);
+		CostStructure costsAdditional = factory.createNewCostStructure(TypeCosts.ADDITIONAL);
+		
+		CostStructure costsDirectWithOverheadWithAdditional = 
+				factory.createNewCostStructure(TypeCosts.TOTAL, costsDirect, costsOverhead, costsAdditional);
+        saveNewCostStructure(costsDirectWithOverheadWithAdditional);
+		
+		//------------------
+		/*
+        Set<String> accounts = ReadExcelFile.createAccountsListFromExcelData(
+                Constants.ACCOUNTS_PROPERTY_EXCEL_FILE_LOCATION_PATH);
+        String costDirectFileName = Constants.COST_DIRECT_EXCEL_FILE_LOCATION_PATH;
+        String costOverheadFileName = Constants.COST_OVERHEAD_EXCEL_FILE_LOCATION_PATH;
+        String additionalFileName = Constants.ADDITIONAL_EXCEL_FILE_LOCATION_PATH;
+
+        Map<String, Double> mapCostsDirect = ReadExcelFile.getMapFromRows(accounts, costDirectFileName);
+        Map<String, Double> mapCostsOverhead = ReadExcelFile.getMapFromRows(accounts, costOverheadFileName);
+        Map<String, Double> mapCostsAdditional = ReadExcelFile.getMapFromColumns("COSTS", additionalFileName);
+
+        String shortName = costDirectFileName.substring(
+                costDirectFileName.lastIndexOf("/"), costDirectFileName.lastIndexOf("."));
+        YearMonth period = getMonthYearFromFileName(shortName);
+
+        CostStructure costsDirect =
+                createNewCostStructure(period, TypeCosts.DIRECT, mapCostsDirect);
+        CostStructure costsOverhead =
+                createNewCostStructure(period, TypeCosts.OVERHEAD, mapCostsOverhead);
+        CostStructure costsAdditional =
+                createNewCostStructure(period, TypeCosts.ADDITIONAL, mapCostsAdditional);
+
+        CostStructure costsDirectWithOverheadWithAdditional =
+                mergeCostStructures(TypeCosts.TOTAL, costsDirect, costsOverhead, costsAdditional);
+
+        saveNewCostStructure(costsDirectWithOverheadWithAdditional);
+		*/
+    }
+
+    @Override
+    public CostStructure saveNewCostStructure(CostStructure costStructure) {
+        return costStructureRepository.save(costStructure);
+    }
+
+    @Override
+    public CostStructure getCostStructure(TypeCosts typeCost, Date monthYear) {
+        return costStructureRepository.findByTypeCostAndDate(typeCost, monthYear);
+    }
+}

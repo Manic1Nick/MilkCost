@@ -5,11 +5,8 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import ua.nick.milkcost.model.Cost;
-import ua.nick.milkcost.model.Milk;
 
 import java.io.FileOutputStream;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -70,7 +67,7 @@ public class WriteExcelFile {
         System.out.println(fileName + " written successfully");
     }
 
-    public static void writeResultMapToExcelFileAsColumnes(String fileName, List<String> indicators,
+    /*public static void writeResultMapToExcelFileAsColumnes(String fileName, List<String> indicators,
                                                            Cost cost, Milk milk) throws Exception{
 
         Map<String, Double> costMap = cost.getCostStructure();
@@ -120,7 +117,7 @@ public class WriteExcelFile {
                 milk.getPriceMilkUnit() - milk.getCostMilkUnitSoldFull()) * 100 / milk.getCostMilkUnitSoldFull());
 
         return mapData;
-    }
+    }*/
 
     private static Workbook createWorkbookForFile(String fileName) throws Exception {
 

@@ -1,12 +1,19 @@
-package ua.nick.milkcost.model;
-
 public class Cost {
 
+    //private YearMonth period;
+    //http://stackoverflow.com/questions/23800477/java-8-time-api-how-to-parse-string-of-format-mm-yyyy-to-localdate
+
+    //private CostType type;
     private String item;
     private double sum;
 
     public Cost() {
     }
+
+    //type is in structures only?
+    /*public Cost(CostType type) {
+        type = type;
+    }*/
 
     public Cost(String item, double sum) {
         this.item = item;
@@ -28,10 +35,10 @@ public class Cost {
     public void setSum(double sum) {
         this.sum = sum;
     }
-
-    public void addSum(double sum) {
-        this.sum += sum;
-    }
+	
+	public void addSum(double sum) {
+		this.sum += sum;
+	}
 
     @Override
     public boolean equals(Object o) {
@@ -41,6 +48,7 @@ public class Cost {
         Cost cost = (Cost) o;
 
         if (Double.compare(cost.sum, sum) != 0) return false;
+        //need for equals Set of costs (adding sum for equals items)
 
         return item != null ? item.equals(cost.item) : cost.item == null;
     }

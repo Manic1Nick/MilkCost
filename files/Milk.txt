@@ -1,23 +1,13 @@
-package ua.nick.milkcost.model;
-
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import java.time.YearMonth;
-import java.util.Map;
-
-@Entity
-@Table(name = "litres")
 public class Milk {
 
-    private YearMonth period;
-    private int cows;
-    private double litresProduced;
-    private double litresSold;
+	private YearMonth period;
+	private int cows;
+    private int litresProduced;
+    private int litresSold;
 
     //private Map<String, Double> beginStructure;
-
-    public Milk() {}
+	
+	public Milk() {}
 
     public Milk(int litresProduced, int litresSold) {
         this.litresProduced = litresProduced;
@@ -28,64 +18,33 @@ public class Milk {
         for (String key : quantityMap.keySet()) {
             if (key.contains("PRODUCE"))
                 this.litresProduced = quantityMap.get(key);
-
+            
             if (key.contains("SOLD"))
                 this.litresSold = quantityMap.get(key);
-
-            if (key.contains("ANIMALS"))
-                this.cows = quantityMap.get(key).intValue();
+			
+			if (key.contains("ANIMALS"))
+                this.cows = quantityMap.get(key);
         }
     }
-
-    @Id
-    public YearMonth getPeriod() {
-        return period;
-    }
-
-    public void setPeriod(YearMonth period) {
-        this.period = period;
-    }
-
-    public int getCows() {
-        return cows;
-    }
-
-    public void setCows(int cows) {
-        this.cows = cows;
-    }
-
-    public double getLitresProduced() {
-        return litresProduced;
-    }
-
-    public void setLitresProduced(double litresProduced) {
-        this.litresProduced = litresProduced;
-    }
-
-    public double getLitresSold() {
-        return litresSold;
-    }
-
-    public void setLitresSold(double litresSold) {
-        this.litresSold = litresSold;
-    }
-
-    public double getMilkProducedByCow() {
-        return litresProduced / cows ;
-    }
-
-    public double getMilkProducedByCowPerDay() {
-        //if can't get days from monthYear
-        //int daysInPeriod = getDaysFromPeriod();
-        return litresProduced / cows / period.lengthOfMonth();
-    }
-
-    public double getMilkSoldPerDay() {
-        //if can't get days from monthYear
-        //int daysInPeriod = getDaysFromPeriod();
-        return litresSold / period.lengthOfMonth();
-    }
-
+	
+	//getters, setters
+	
+	public double getMilkProducedByCow() {
+		return litresProduced / cows ;
+	}
+	
+	public double getMilkProducedByCowPerDay() {
+		//if can't get days from monthYear 
+		//int daysInPeriod = getDaysFromPeriod(); 
+		return litresProduced / cows / period.lengthOfMonth();
+	}
+	
+	public double getMilkSoldPerDay() {
+		//if can't get days from monthYear
+		//int daysInPeriod = getDaysFromPeriod(); 
+		return litresSold / period.lengthOfMonth();
+	}
+	
 	/*
 	private int getDaysFromPeriod() {
 		int days;
@@ -95,13 +54,13 @@ public class Milk {
 			days = 30;
 		else if (month31.contains(period.getMonth())
 			days = 31;
-		else
+		else 
 			days = 28;
-
+			
 		return days;
 	}
 	*/
-
+	
 /*
     public double getCostMilkUnitProduceFull() {
         return (cost.getCostDirect() + cost.getCostOverhead() +

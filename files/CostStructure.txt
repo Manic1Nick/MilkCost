@@ -1,0 +1,78 @@
+public abstract class CostStructure {
+
+    public YearMonth period;
+    public TypeCosts type;
+	public String fileNamePath;	
+	public Set<String> accounts;
+
+	public Map<String, Double> mapCosts;	
+
+    //one to many
+    public Set<Cost> costs;
+	
+	public ReadExcelFile readXls;	
+	
+	/*
+    public CostStructure() {
+    }
+
+    public CostStructure(TypeCosts type) {
+        this.type = type;
+    }
+	
+	public CostStructure(YearMonth period, Set<String> accounts) {
+        this.period = period;
+		this.accounts = accounts;
+		createSetCosts();
+    }
+	*/
+	
+	abstract Set<String> createSetCosts();
+
+    public YearMonth getPeriod() {
+        return period;
+    }
+
+    public void setPeriod(YearMonth period) {
+        this.period = period;
+    }
+
+    public TypeCosts getType() {
+        return type;
+    }
+
+    public void setType(TypeCosts type) {
+        this.type = type;
+    }
+
+    public Set<Cost> getCosts() {
+        return costs;
+    }
+
+    public void setCosts(Set<Cost> costs) {
+        this.costs = costs;
+    }
+	
+	//?
+	public boolean addCosts(Cost... args) {
+
+        if (args.length >= 0) {
+            for (int i = 0; i < args.length; i++)
+                costs.addCost(args[i]);
+
+            return true;
+        }
+
+        return false;
+    }	
+
+    private boolean addCost(Cost newCost) {
+        for (Cost cost : costs) {
+            if (newCost.getItem().equals(cost.getItem())) {
+                cost.addSum(newCost.getSum());
+                return true;
+            }
+        }
+        return costs.add(newCost);
+    }
+}

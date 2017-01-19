@@ -7,15 +7,14 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import ua.nick.milkcost.model.CostStructure;
+import ua.nick.milkcost.model.FileDescription;
 import ua.nick.milkcost.model.TypeCosts;
 import ua.nick.milkcost.service.CostService;
 
 import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.YearMonth;
+import java.util.List;
 
 @Controller
 public class ApplicationController {
@@ -37,12 +36,13 @@ public class ApplicationController {
     @RequestMapping(value = "/costs/add", method = RequestMethod.GET)
     public String addNewCosts(@ModelAttribute("message") String message, Model model, Principal principal) {
 
-        costService.createCostStructures();
-
-        //CostStructure newCostStructure = userService.saveNewCostStructure(costStructure);
-        //todo replace this operation to updateCostStructure() in userService
-
-        //model.addAttribute("message", "Costs " + newCostStructure.getMonthYear() + " was added");
+        //check new files in work folder
+        List<FileDescription> newFiles = costService.getNewFiles();
+        if (newFiles == null || newFiles.size() == 0)
+            model.addAttribute("message", "There are no new files in work folder");
+        else
+            costService.createCostStructures(newFiles);
+            //model.addAttribute("message", "Costs " + newCostStructure.getMonthYear() + " was added");
 
         return "welcome";
     }
@@ -50,22 +50,19 @@ public class ApplicationController {
     @RequestMapping(value = "/costs/get", method = RequestMethod.GET)
     public String getCosts(Model model, HttpServletRequest req) {
 
-        String typeCostStr = req.getParameter("type");
-        TypeCosts typeCost = typeCostStr.equals("TOTAL") ? TypeCosts.TOTAL :
-                typeCostStr.equals("OVERHEAD") ? TypeCosts.OVERHEAD :
-                        typeCostStr.equals("DIRECT") ? TypeCosts.DIRECT : null ;
+        String typeCostsStr = req.getParameter("type");
+        TypeCosts typeCosts = costService.findTypeCostsByString(typeCostsStr);
 
-        String dateMonthYear = "2016-10";
-        DateFormat df = new SimpleDateFormat("yyyy-MM");
-        Date date = new Date();
-        try {
-            date = df.parse(dateMonthYear);
-        } catch (ParseException e) {
+        String monthYearStr = req.getParameter("period");
+        YearMonth period = costService.getYearMonthFromString(monthYearStr);
+
+        //need this or not?
+        if (typeCosts == null || period == null){
             model.addAttribute("message", "Costs getting error");
             return "welcome";
         }
 
-        CostStructure costStructure = costService.getCostStructure(typeCost, date);
+        CostStructure costStructure = costService.getCostStructure(typeCosts, period);
         model.addAttribute("costStructure", costStructure);
 
         return "costs";

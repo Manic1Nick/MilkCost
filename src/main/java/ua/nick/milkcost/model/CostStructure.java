@@ -1,44 +1,33 @@
 package ua.nick.milkcost.model;
 
+import ua.nick.milkcost.utils.ReadExcelFileUtil;
+
 import javax.persistence.Entity;
+import javax.persistence.Id;
 import javax.persistence.Table;
+import java.io.File;
 import java.time.YearMonth;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 @Entity
 @Table(name = "costs")
-public class CostStructure {
+public abstract class CostStructure {
 
-    private YearMonth period;
-    //http://stackoverflow.com/questions/23800477/java-8-time-api-how-to-parse-string-of-format-mm-yyyy-to-localdate
+    public YearMonth period;
+    public TypeCosts type;
+    public String fileNamePath;
+    public Set<String> accounts;
+    public Map<String, Double> mapCosts;
+    public Set<Cost> costs;
+    public ReadExcelFileUtil readXls;
+    public List<File> newFiles;
 
-    private TypeCosts type;
+    abstract Set<Cost> createSetCosts();
 
-    //one to many
-    private Set<Cost> costs;
-
-    public CostStructure() {
-    }
-
-    public CostStructure(TypeCosts type) {
-        this.type = type;
-    }
-
-    public CostStructure(YearMonth mmYYYY, TypeCosts type) {
-        this.period = mmYYYY;
-        this.type = type;
-    }
-
-    public CostStructure(Set<Cost> costs) {
-        this.costs = costs;
-    }
-
-    public CostStructure(YearMonth mmYYYY, TypeCosts type, Set<Cost> costs) {
-        this.period = mmYYYY;
-        this.type = type;
-        this.costs = costs;
-    }
-
+    @Id
     public YearMonth getPeriod() {
         return period;
     }
@@ -63,13 +52,67 @@ public class CostStructure {
         this.costs = costs;
     }
 
-    public boolean addCost(Cost newCost) {
+    public List<File> getNewFiles() {
+        return newFiles;
+    }
+
+    public void setNewFiles(List<File> newFiles) {
+        this.newFiles = newFiles;
+    }
+
+    public Set<Cost> mergeCostSets(Set<Cost> costs, Set<Cost> addCosts) { //get costs original, addCosts copy
+
+        if (addCosts.size() > 0) {
+            if (costs.size() > 0)
+                costs = additionCostSets(costs, addCosts);
+            else
+                costs = addCosts;
+        }
+        return costs;
+    }
+
+    private Set<Cost> additionCostSets(Set<Cost> costs, Set<Cost> addCosts) { //get costs original, addCosts copy
+
+        for (Cost cost1 : costs) {
+            String name = cost1.getItem();
+
+            Iterator<Cost> iterator = addCosts.iterator();
+            boolean continueIterator = true;
+            while (continueIterator && iterator.hasNext()) {
+                Cost cost2 = iterator.next();
+                if (name.equals(cost2.getItem())) {
+                    cost1.addSum(cost2.getSum());
+                    addCosts.remove(cost2);
+                    continueIterator = false;
+                }
+            }
+        }
+
+        if (addCosts.size() > 0)
+            costs.addAll(addCosts);
+
+        return costs;
+    }
+
+    /*public boolean addCosts(Cost... args) {
+        boolean result = false;
+        if (args.length > 0) {
+            for (int i = 0; i < args.length; i++) {
+                result = costs.add(args[i]);
+                if (!result)
+                    return result;
+            }
+        }
+        return result;
+    }
+
+    private boolean addCost(Cost newCost) {
         for (Cost cost : costs) {
             if (newCost.getItem().equals(cost.getItem())) {
-                cost.setSum(cost.getSum() + newCost.getSum());
+                cost.addSum(newCost.getSum());
                 return true;
             }
         }
         return costs.add(newCost);
-    }
+    }*/
 }

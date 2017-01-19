@@ -26,4 +26,7 @@ public final class Constants {
     //write data
     public static final String RESULT_EXCEL_FILE_LOCATION_PATH =
             "/home/jessy/IdeaProjects/data_xls/result_2016_10.xls";
+
+    public static final String FOLDER_WITH_FILES_FOR_MILK_COST =
+            "/home/jessy/IdeaProjects/data_xls";
 }

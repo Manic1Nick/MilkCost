@@ -7,53 +7,25 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.*;
 
-public class ReadExcelFile {
+public class ReadExcelFileUtil {
 
-    private static List<List<String>> readExcelData(String fileName) {
+    private ListFilesUtil fUtil;
 
-        List<List<String>> rows = new ArrayList<>();
-        int startColumn = 0;
-        int startRow = 0;
-
-        try {
-            FileInputStream fis = new FileInputStream(fileName);
-            Sheet sheet = getSheetFromFile(fis, fileName);
-            Iterator<Row> rowIterator = sheet.iterator();
-
-            while (rowIterator.hasNext()) {
-                List<String> currentRow = new ArrayList<>();
-
-                Row row = rowIterator.next();
-                Iterator<Cell> cellIterator = row.cellIterator();
-
-                String currentCell = "";
-                while (cellIterator.hasNext() && !currentCell.equals("END")) {
-                    Cell cell = cellIterator.next();
-                    currentCell = cell.toString().trim();
-                    currentRow.add(currentCell);
-
-                    if (currentCell.equals("START")) {
-                        startColumn = cell.getColumnIndex();
-                        startRow = cell.getRowIndex();
-                    }
-                }
-                rows.add(currentRow);
-            }
-            fis.close();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return getCleanRows(startRow, startColumn, rows);
+    public ReadExcelFileUtil() {
+        this.fUtil = new ListFilesUtil();
     }
 
-    public static List<String> createIndicatorsListFromExcelData(String fileName) {
+    public List<File> getCurrentListOfAllFiles() {
+        return Arrays.asList(fUtil.getfList());
+    }
+
+    public List<String> createIndicatorsListFromExcelData(String fileName) {
 
         List<String> resultForm = new ArrayList<>();
 
@@ -84,7 +56,7 @@ public class ReadExcelFile {
         return resultForm;
     }
 
-    public static Map<String, Double> getMapFromRows(Set<String> setMarkers, String fileName) {
+    public Map<String, Double> getMapFromRows(Set<String> setMarkers, String fileName) {
 
         List<List<String>> rows = readExcelData(fileName);
 
@@ -117,7 +89,7 @@ public class ReadExcelFile {
         return mapData;
     }
 
-    public static Map<String, Double> getMapFromColumns(String marker, String fileName) {
+    public Map<String, Double> getMapFromColumns(String marker, String fileName) {
 
         List<List<String>> rows = readExcelData(fileName);
 
@@ -148,7 +120,7 @@ public class ReadExcelFile {
         return mapData;
     }
 
-    public static Set<String> createAccountsListFromExcelData(String fileName) {
+    public Set<String> createAccountsListFromExcelData(String fileName) {
 
         //create set unique accounts
         Set<String> accounts = new HashSet<>();
@@ -185,7 +157,7 @@ public class ReadExcelFile {
         return accounts;
     }
 
-    private static Sheet getSheetFromFile(FileInputStream fis, String fileName) throws IOException {
+    private Sheet getSheetFromFile(FileInputStream fis, String fileName) throws IOException {
 
         Workbook workbook = null;
         if(fileName.toLowerCase().endsWith("xlsx")){
@@ -197,13 +169,13 @@ public class ReadExcelFile {
         return workbook.getSheetAt(0);
     }
 
-    private static String getStringAccountFromCell(Cell cell) {
+    private String getStringAccountFromCell(Cell cell) {
 
         String cellStr = cell.toString().trim();
         return cellStr.contains(".") ? cellStr.substring(0, cellStr.indexOf(".")) : cellStr;
     }
 
-    private static List<List<String>> getCleanRows(int startRow, int startColumn, List<List<String>> rows){
+    private List<List<String>> getCleanRows(int startRow, int startColumn, List<List<String>> rows){
 
         List<List<String>> rowsClean = new ArrayList<>();
 
@@ -214,5 +186,44 @@ public class ReadExcelFile {
                 rowsClean.add(newCleanRow);
         }
         return rowsClean;
+    }
+
+    private List<List<String>> readExcelData(String fileName) {
+
+        List<List<String>> rows = new ArrayList<>();
+        int startColumn = 0;
+        int startRow = 0;
+
+        try {
+            FileInputStream fis = new FileInputStream(fileName);
+            Sheet sheet = getSheetFromFile(fis, fileName);
+            Iterator<Row> rowIterator = sheet.iterator();
+
+            while (rowIterator.hasNext()) {
+                List<String> currentRow = new ArrayList<>();
+
+                Row row = rowIterator.next();
+                Iterator<Cell> cellIterator = row.cellIterator();
+
+                String currentCell = "";
+                while (cellIterator.hasNext() && !currentCell.equals("END")) {
+                    Cell cell = cellIterator.next();
+                    currentCell = cell.toString().trim();
+                    currentRow.add(currentCell);
+
+                    if (currentCell.equals("START")) {
+                        startColumn = cell.getColumnIndex();
+                        startRow = cell.getRowIndex();
+                    }
+                }
+                rows.add(currentRow);
+            }
+            fis.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return getCleanRows(startRow, startColumn, rows);
     }
 }
