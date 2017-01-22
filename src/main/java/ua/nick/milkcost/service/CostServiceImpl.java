@@ -47,7 +47,6 @@ public class CostServiceImpl implements CostService {
 
         CostStructure costsDirectWithOverheadWithAdditional =
                 factory.createNewCostStructure(TypeCosts.TOTAL, costsDirect, costsOverhead, costsAdditional);
-
         saveNewCostStructure(costsDirectWithOverheadWithAdditional);
     }
 
@@ -77,8 +76,8 @@ public class CostServiceImpl implements CostService {
 
     @Override
     public List<FileDescription> getNewFiles() {
-        List<FileDescription> filesInDB = fileDataRepository.findAll();
-        List<File> filesInWorkFolder = Arrays.asList(fUtil.getfList());
+        List<FileDescription> filesInDB = getAllFilesFromDB();
+        List<File> filesInWorkFolder = getAllFilesFromWorkFolder();
 
         if (filesInWorkFolder.size() > 0) {
             return fUtil.getNewFileDescriptions(filesInDB, filesInWorkFolder);
@@ -92,5 +91,15 @@ public class CostServiceImpl implements CostService {
         for (FileDescription fileDescription : newFiles) {
             fileDataRepository.save(fileDescription);
         }
+    }
+
+    @Override
+    public List<FileDescription> getAllFilesFromDB() {
+        return fileDataRepository.findAll();
+    }
+
+    @Override
+    public List<File> getAllFilesFromWorkFolder() {
+        return Arrays.asList(fUtil.getfList());
     }
 }

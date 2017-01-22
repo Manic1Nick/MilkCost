@@ -9,14 +9,12 @@ import java.util.Set;
 
 public class CostStructureFactory {
 
-    private YearMonth period;
     private Set<String> accounts;
     private ReadExcelFileUtil readFilesUtil;
     private DateUtil dateUtil;
     private List<FileDescription> newFiles;
 
     public CostStructureFactory() {
-        period = getYearMonth();
         accounts = createAccountsList();
         readFilesUtil = new ReadExcelFileUtil();
         dateUtil = new DateUtil();
@@ -28,7 +26,9 @@ public class CostStructureFactory {
 
     public CostStructure createNewCostStructure(TypeCosts type, CostStructure... args) {
         CostStructure costStructure = null;
+
         String filePath = getFilePath(type);
+        YearMonth period = getYearMonth(filePath);
 
         if (type == TypeCosts.DIRECT)
             costStructure = new CostStructureDirect(period, accounts, filePath);
@@ -43,11 +43,9 @@ public class CostStructureFactory {
             costStructure = new CostStructureTotal(args);
 
         return costStructure;
-    };
+    }
 
-    private YearMonth getYearMonth() {
-        String filePath = Constants.COST_DIRECT_EXCEL_FILE_LOCATION_PATH;
-
+    private YearMonth getYearMonth(String filePath) {
         YearMonth mmYYYY = null;
 
         String[] filePathArray = filePath.split("/");
@@ -56,8 +54,8 @@ public class CostStructureFactory {
 
         if (dateArray.length >= 3)
             mmYYYY = dateUtil.getYearMonthFromString(String.format("%s.%s",
-                            dateArray[dateArray.length-1],
-                            dateArray[dateArray.length-2]));
+                    dateArray[dateArray.length-1],
+                    dateArray[dateArray.length-2]));
 
         return mmYYYY;
     }

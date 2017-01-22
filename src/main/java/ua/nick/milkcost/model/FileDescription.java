@@ -35,9 +35,9 @@ public class FileDescription {
     }
 
     public TypeCosts getTypeCostsOfFile() {
-        if (fileName.contains("231"))
+        if (fileName.toLowerCase().contains("direct"))
             return TypeCosts.DIRECT;
-        else if (fileName.contains("911"))
+        else if (fileName.toLowerCase().contains("overhead"))
             return TypeCosts.OVERHEAD;
         else if (fileName.toLowerCase().contains("additional"))
             return TypeCosts.ADDITIONAL;

@@ -4,6 +4,7 @@ import ua.nick.milkcost.model.CostStructure;
 import ua.nick.milkcost.model.FileDescription;
 import ua.nick.milkcost.model.TypeCosts;
 
+import java.io.File;
 import java.time.YearMonth;
 import java.util.List;
 
@@ -17,4 +18,6 @@ public interface CostService {
 
     List<FileDescription> getNewFiles();
     void saveNewFiles(List<FileDescription> newFiles);
+    List<FileDescription> getAllFilesFromDB();
+    List<File> getAllFilesFromWorkFolder();
 }

@@ -19,7 +19,7 @@ public class CostStructureTotal extends CostStructure {
         Set<Cost> costs = new HashSet<>(costStructures[0].getCosts());
         for (int i = 1; i < costStructures.length; i++) {
             Set<Cost> subCosts = new HashSet<>(costStructures[i].getCosts()); //create new copy
-            costs = mergeCostSets(costs, subCosts); //maybe need without "costs = "
+            costs = mergeCostSets(costs, subCosts);
         }
         return costs;
     }
