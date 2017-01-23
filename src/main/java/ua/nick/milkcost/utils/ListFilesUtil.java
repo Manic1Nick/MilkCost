@@ -5,7 +5,6 @@ import ua.nick.milkcost.model.FileDescription;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -23,20 +22,6 @@ public class ListFilesUtil {
     public ListFilesUtil(String directoryName) {
         directory = new File(directoryName);
         fList = directory.listFiles();
-    }
-
-    public List<String> listFiles() {
-        return Arrays.stream(fList)
-                .filter(File::isFile)
-                .map(File::getName)
-                .collect(Collectors.toList());
-    }
-
-    public List<String> listFolders(){
-        return Arrays.stream(fList)
-                .filter(File::isDirectory)
-                .map(File::getName)
-                .collect(Collectors.toList());
     }
 
     public List<String> listFilesAndFilesSubDirectories() {
@@ -61,8 +46,8 @@ public class ListFilesUtil {
         return this.fList;
     }
 
-    public List<FileDescription> getNewFileDescriptions(
-            List<FileDescription> filesInDB, List<File> filesInFolder) {
+    /*public List<FileDescription> getNewFileDescriptions(
+            List<FileDescription> filesInDB, List<File> filesInFolder) { //filesInFolder > 0 !
 
         if (filesInDB.size() == 0)
             return copyFilesToFileDescriptions(filesInFolder);
@@ -80,20 +65,50 @@ public class ListFilesUtil {
     }
 
     private List<FileDescription> findNewFilesAndCopyToFileDescriptions(
-                List<FileDescription> filesInDB, List<File> filesInFolder) {
+            List<FileDescription> filesInDB, List<File> filesInFolder) {
         List<FileDescription> newFileDescriptions = new ArrayList<>();
 
         for (File file : filesInFolder) {
             Date dateLastModified = new Date(file.lastModified());
 
             for (FileDescription fileDescription : filesInDB) {
-                if (file.getName().equals(fileDescription.getFileName()) &&
-                        dateLastModified.after(fileDescription.getDateOfLastChange())) {
+                boolean names = file.getName().equals(fileDescription.getFileName());
+                boolean dates = dateLastModified.after(fileDescription.getDateOfLastChange());
+                if (!names || (names && dates))
                     newFileDescriptions.add(new FileDescription(file));
-                }
             }
         }
         return newFileDescriptions;
+    }*/
+
+	public List<FileDescription> getNewFileDescriptions(
+				List<FileDescription> filesInDB, List<File> filesInFolder) { //filesInFolder.size() > 0 !
+		List<FileDescription> newDbFiles = new ArrayList<>();
+
+		if (filesInDB.size() == 0) {
+            newDbFiles = filesInFolder.stream()
+                    .map(file -> new FileDescription(file)).collect(Collectors.toList());
+        } else {
+            for (File file : filesInFolder) { //filesInDB.size() > 0 !
+                FileDescription newDbFile = createNewDbFile(filesInDB, file);
+                if (newDbFile != null)
+                    newDbFiles.add(newDbFile);
+            }
+        }
+		return newDbFiles;
+    }
+
+	private FileDescription createNewDbFile(List<FileDescription> filesInDB, File file) {
+        FileDescription fileInDB = filesInDB.stream()
+                .filter(f -> f.getFile().getName().equals(file.getName())).findAny().orElse(null);
+		if (fileInDB != null) {
+			Date newFileDateModified = new Date(file.lastModified());
+			Date dbFileDateModified = fileInDB.getDateOfLastChange();
+
+			if (!newFileDateModified.after(dbFileDateModified))
+				return null;
+		}
+		return new FileDescription(file);
     }
 
     //test
