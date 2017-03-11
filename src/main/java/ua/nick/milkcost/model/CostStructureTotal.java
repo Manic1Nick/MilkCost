@@ -1,15 +1,19 @@
 package ua.nick.milkcost.model;
 
+import javax.persistence.Entity;
+import javax.persistence.Table;
 import java.util.HashSet;
 import java.util.Set;
 
+@Entity
+@Table(name = "structures_total")
 public class CostStructureTotal extends CostStructure {
 
     private CostStructure[] costStructures;
 
     public CostStructureTotal(CostStructure... args) {
-        this.period = args[0].getPeriod();
-        this.type = TypeCosts.TOTAL;
+        this.date = args[0].getDate();
+        this.typeCosts = TypeCosts.TOTAL;
         fileNamePath = "";
         this.costStructures = args;
         this.costs = createSetCosts();

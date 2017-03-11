@@ -3,8 +3,8 @@ package ua.nick.milkcost.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import ua.nick.milkcost.model.FileDescription;
 
-import java.time.YearMonth;
+import java.util.List;
 
-public interface FileDataRepository extends JpaRepository<FileDescription, YearMonth> {
-
+public interface FileDataRepository extends JpaRepository<FileDescription, Long> {
+    List<FileDescription> findAll();
 }

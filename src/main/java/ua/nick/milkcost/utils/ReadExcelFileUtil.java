@@ -6,6 +6,9 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.stereotype.Component;
+import ua.nick.milkcost.model.FileDescription;
+import ua.nick.milkcost.model.TypeCosts;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -13,6 +16,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.*;
 
+@Component
 public class ReadExcelFileUtil {
 
     private ListFilesUtil fUtil;
@@ -128,7 +132,7 @@ public class ReadExcelFileUtil {
         try {
             if (!fileName.toLowerCase().contains("accounts") &&
                     !fileName.toLowerCase().contains("property")) {
-                throw new FileNotFoundException("file isn't has accounts property");
+                throw new FileNotFoundException("file doesn't have accounts property");
             }
 
             FileInputStream fis = new FileInputStream(fileName);
@@ -155,6 +159,25 @@ public class ReadExcelFileUtil {
         }
 
         return accounts;
+    }
+
+    public Set<String> getAccountsFromNewFiles(List<FileDescription> newFiles) {
+
+        Set<String> accounts = new HashSet<>();
+
+        for (FileDescription file : newFiles) {
+            if (file.getFileName().contains("accounts"))
+                accounts = createAccountsListFromExcelData(file.getFile().getAbsolutePath());
+        }
+        return accounts;
+    }
+
+    public String getFilePath(TypeCosts typeCosts, List<FileDescription> newFiles) {
+        for (FileDescription fileDescription : newFiles) {
+            if (fileDescription.getTypeCosts() == typeCosts)
+                return fileDescription.getFile().getAbsolutePath();
+        }
+        return "";
     }
 
     private Sheet getSheetFromFile(FileInputStream fis, String fileName) throws IOException {

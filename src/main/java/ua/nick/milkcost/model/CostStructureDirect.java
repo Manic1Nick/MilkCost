@@ -1,15 +1,18 @@
 package ua.nick.milkcost.model;
 
-import java.time.YearMonth;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+@Entity
+@Table(name = "structures_direct")
 public class CostStructureDirect extends CostStructure {
 
-    public CostStructureDirect(YearMonth period, Set<String> accounts, String filePath) {
-        this.period = period;
-        this.type = TypeCosts.DIRECT;
-        //fileNamePath = Constants.COST_DIRECT_EXCEL_FILE_LOCATION_PATH;
+    public CostStructureDirect(Date date, Set<String> accounts, String filePath) {
+        this.date = date;
+        this.typeCosts = TypeCosts.DIRECT;
         fileNamePath = filePath;
         this.accounts = accounts;
         this.costs = createSetCosts();

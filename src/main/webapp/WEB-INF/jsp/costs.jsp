@@ -73,7 +73,7 @@
             <tbody>
             <c:forEach items="${costs}" var="cost">
                 <tr>
-                    <td><c:out value="${cost[monthYear]}" /></td>
+                    <td><c:out value="${cost[date]}" /></td>
 
                     <td><c:out value="${cost[costGas]}" /></td>
                     <td><c:out value="${cost[costRepairs]}" /></td>

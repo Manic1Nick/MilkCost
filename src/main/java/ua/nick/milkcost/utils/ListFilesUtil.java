@@ -1,5 +1,6 @@
 package ua.nick.milkcost.utils;
 
+import org.springframework.stereotype.Component;
 import ua.nick.milkcost.model.Constants;
 import ua.nick.milkcost.model.FileDescription;
 
@@ -9,6 +10,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Component
 public class ListFilesUtil {
 
     private File directory;
@@ -98,7 +100,7 @@ public class ListFilesUtil {
 		return newDbFiles;
     }
 
-	private FileDescription createNewDbFile(List<FileDescription> filesInDB, File file) {
+    private FileDescription createNewDbFile(List<FileDescription> filesInDB, File file) {
         FileDescription fileInDB = filesInDB.stream()
                 .filter(f -> f.getFile().getName().equals(file.getName())).findAny().orElse(null);
 		if (fileInDB != null) {
@@ -120,4 +122,6 @@ public class ListFilesUtil {
             System.out.println(s);
         }
     }
+
+
 }

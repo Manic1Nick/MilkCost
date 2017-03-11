@@ -2,48 +2,58 @@ package ua.nick.milkcost.model;
 
 import ua.nick.milkcost.utils.ReadExcelFileUtil;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import java.io.File;
-import java.time.YearMonth;
+import javax.persistence.*;
+import java.util.Date;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 @Entity
-@Table(name = "costs")
+@Table(name = "structures")
 public abstract class CostStructure {
 
-    public YearMonth period;
-    public TypeCosts type;
+    public Long id;
+    public Date date;
+    public TypeCosts typeCosts;
     public String fileNamePath;
     public Set<String> accounts;
     public Map<String, Double> mapCosts;
     public Set<Cost> costs;
-    public ReadExcelFileUtil readXls;
-    public List<File> newFiles;
+    public ReadExcelFileUtil readXls = new ReadExcelFileUtil();
+    //public List<File> newFiles;
 
     abstract Set<Cost> createSetCosts();
 
     @Id
-    public YearMonth getPeriod() {
-        return period;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    public Long getId() {
+        return id;
     }
 
-    public void setPeriod(YearMonth period) {
-        this.period = period;
+    public void setId(Long id) {
+        this.id = id;
     }
 
-    public TypeCosts getType() {
-        return type;
+    @Temporal(TemporalType.DATE)
+    public Date getDate() {
+        return date;
     }
 
-    public void setType(TypeCosts type) {
-        this.type = type;
+    public void setDate(Date date) {
+        this.date = date;
     }
 
+    public TypeCosts getTypeCosts() {
+        return typeCosts;
+    }
+
+    public void setTypeCosts(TypeCosts typeCosts) {
+        this.typeCosts = typeCosts;
+    }
+
+    @ManyToMany
+    @JoinTable(name = "structures_costs", joinColumns = @JoinColumn(name = "structure_id"),
+            inverseJoinColumns = @JoinColumn(name = "cost_id"))
     public Set<Cost> getCosts() {
         return costs;
     }
@@ -52,13 +62,13 @@ public abstract class CostStructure {
         this.costs = costs;
     }
 
-    public List<File> getNewFiles() {
+    /*public List<File> getNewFiles() {
         return newFiles;
     }
 
     public void setNewFiles(List<File> newFiles) {
         this.newFiles = newFiles;
-    }
+    }*/
 
     public Set<Cost> mergeCostSets(Set<Cost> costs, Set<Cost> addCosts) { //get costs original, addCosts copy
 

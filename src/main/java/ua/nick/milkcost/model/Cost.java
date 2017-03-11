@@ -1,7 +1,12 @@
 package ua.nick.milkcost.model;
 
+import javax.persistence.*;
+
+@Entity
+@Table(name = "costs")
 public class Cost {
 
+    private Long id;
     private String item;
     private double sum;
 
@@ -11,6 +16,16 @@ public class Cost {
     public Cost(String item, double sum) {
         this.item = item;
         this.sum = sum;
+    }
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getItem() {

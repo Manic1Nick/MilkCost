@@ -3,14 +3,16 @@ package ua.nick.milkcost.model;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import java.time.YearMonth;
+import javax.persistence.Transient;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Map;
 
 @Entity
 @Table(name = "litres")
 public class Milk {
 
-    private YearMonth period;
+    private Date period;
     private int cows;
     private double litresProduced;
     private double litresSold;
@@ -25,7 +27,11 @@ public class Milk {
     }
 
     public Milk(Map<String, Double> quantityMap) {
-        for (String key : quantityMap.keySet()) {
+        this.litresProduced = quantityMap.get("PRODUCE");
+        this.litresSold = quantityMap.get("SOLD");
+        this.cows = quantityMap.get("ANIMALS").intValue();
+
+        /*for (String key : quantityMap.keySet()) {
             if (key.contains("PRODUCE"))
                 this.litresProduced = quantityMap.get(key);
 
@@ -34,15 +40,15 @@ public class Milk {
 
             if (key.contains("ANIMALS"))
                 this.cows = quantityMap.get(key).intValue();
-        }
+        }*/
     }
 
     @Id
-    public YearMonth getPeriod() {
+    public Date getPeriod() {
         return period;
     }
 
-    public void setPeriod(YearMonth period) {
+    public void setPeriod(Date period) {
         this.period = period;
     }
 
@@ -70,20 +76,24 @@ public class Milk {
         this.litresSold = litresSold;
     }
 
-    public double getMilkProducedByCow() {
+    public double calculateMilkProducedByCow() {
         return litresProduced / cows ;
     }
 
-    public double getMilkProducedByCowPerDay() {
-        //if can't get days from monthYear
-        //int daysInPeriod = getDaysFromPeriod();
-        return litresProduced / cows / period.lengthOfMonth();
+    public double calculateMilkProducedByCowPerDay() {
+        return litresProduced / cows / getDayOfMonth();
     }
 
-    public double getMilkSoldPerDay() {
-        //if can't get days from monthYear
-        //int daysInPeriod = getDaysFromPeriod();
-        return litresSold / period.lengthOfMonth();
+    public double calculateMilkSoldPerDay() {
+        return litresSold / getDayOfMonth();
+    }
+
+    @Transient
+    private int getDayOfMonth() {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(period);
+
+        return cal.get(Calendar.DAY_OF_MONTH);
     }
 
 	/*

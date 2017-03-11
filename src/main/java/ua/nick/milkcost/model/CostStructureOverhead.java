@@ -1,15 +1,18 @@
 package ua.nick.milkcost.model;
 
-import java.time.YearMonth;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+@Entity
+@Table(name = "structures_overhead")
 public class CostStructureOverhead extends CostStructure {
 
-    public CostStructureOverhead(YearMonth period, Set<String> accounts, String filePath) {
-        this.period = period;
-        this.type = TypeCosts.OVERHEAD;
-        //fileNamePath = Constants.COST_OVERHEAD_EXCEL_FILE_LOCATION_PATH;
+    public CostStructureOverhead(Date date, Set<String> accounts, String filePath) {
+        this.date = date;
+        this.typeCosts = TypeCosts.OVERHEAD;
         fileNamePath = filePath;
         this.accounts = accounts;
         this.costs = createSetCosts();

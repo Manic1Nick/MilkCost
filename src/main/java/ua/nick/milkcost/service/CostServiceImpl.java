@@ -2,19 +2,16 @@ package ua.nick.milkcost.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ua.nick.milkcost.model.CostStructure;
-import ua.nick.milkcost.model.CostStructureFactory;
-import ua.nick.milkcost.model.FileDescription;
-import ua.nick.milkcost.model.TypeCosts;
+import ua.nick.milkcost.model.*;
+import ua.nick.milkcost.repository.CostRepository;
 import ua.nick.milkcost.repository.CostStructureRepository;
 import ua.nick.milkcost.repository.FileDataRepository;
 import ua.nick.milkcost.utils.DateUtil;
 import ua.nick.milkcost.utils.ListFilesUtil;
+import ua.nick.milkcost.utils.ReadExcelFileUtil;
 
 import java.io.File;
-import java.time.YearMonth;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 @Service(value = "service")
 public class CostServiceImpl implements CostService {
@@ -25,14 +22,22 @@ public class CostServiceImpl implements CostService {
     @Autowired
     private FileDataRepository fileDataRepository;
 
+    @Autowired
+    private CostRepository costRepository;
+
+    @Autowired
     private CostStructureFactory factory;
-    private DateUtil dateUtil; //need this here???
-    private ListFilesUtil fUtil;
+
+    @Autowired
+    private DateUtil dateUtil; //todo need this here???
+
+    @Autowired
+    private ListFilesUtil listFilesUtil;
+
+    @Autowired
+    private ReadExcelFileUtil readExcelFilesUtil;
 
     public CostServiceImpl() {
-        this.factory = new CostStructureFactory();
-        dateUtil = new DateUtil();
-        fUtil = new ListFilesUtil();
     }
 
     @Override
@@ -40,13 +45,22 @@ public class CostServiceImpl implements CostService {
 
         saveNewFiles(newFiles);
         factory.setNewFiles(newFiles);
+        factory.setAccounts(readExcelFilesUtil.getAccountsFromNewFiles(newFiles));
 
         CostStructure costsDirect = factory.createNewCostStructure(TypeCosts.DIRECT);
+        costsDirect = saveCostsFromCostStructure(costsDirect);
+
         CostStructure costsOverhead = factory.createNewCostStructure(TypeCosts.OVERHEAD);
+        costsOverhead = saveCostsFromCostStructure(costsOverhead);
+
         CostStructure costsAdditional = factory.createNewCostStructure(TypeCosts.ADDITIONAL);
+        costsAdditional = saveCostsFromCostStructure(costsAdditional);
 
         CostStructure costsDirectWithOverheadWithAdditional =
                 factory.createNewCostStructure(TypeCosts.TOTAL, costsDirect, costsOverhead, costsAdditional);
+        costsDirectWithOverheadWithAdditional =
+                saveCostsFromCostStructure(costsDirectWithOverheadWithAdditional);
+
         saveNewCostStructure(costsDirectWithOverheadWithAdditional);
     }
 
@@ -56,22 +70,22 @@ public class CostServiceImpl implements CostService {
     }
 
     @Override
-    public CostStructure getCostStructure(TypeCosts typeCost, YearMonth monthYear) {
-        return costStructureRepository.findByTypeCostsAndYearMonth(typeCost, monthYear);
+    public CostStructure getCostStructure(TypeCosts typeCost, Date date) {
+        return costStructureRepository.findByTypeCostsAndDate(typeCost, date);
     }
 
     @Override
     public TypeCosts findTypeCostsByString(String typeStr) {
-        for (TypeCosts typeCosts : Arrays.asList(TypeCosts.values())) {
+        for (TypeCosts typeCosts : Arrays.asList(TypeCosts.values()))
             if (typeStr.equals(typeCosts.toString()))
                 return typeCosts;
-        }
+
         return null;
     }
 
     @Override
-    public YearMonth getYearMonthFromString(String monthPointYear) {
-        return dateUtil.getYearMonthFromString(monthPointYear);
+    public Date getDateFromString(String date) {
+        return dateUtil.getDateFromString(date);
     }
 
     @Override
@@ -79,18 +93,16 @@ public class CostServiceImpl implements CostService {
         List<FileDescription> filesInDB = getAllFilesFromDB();
         List<File> filesInWorkFolder = getAllFilesFromWorkFolder();
 
-        if (filesInWorkFolder.size() > 0) {
-            return fUtil.getNewFileDescriptions(filesInDB, filesInWorkFolder);
-        }
+        if (filesInWorkFolder.size() > 0)
+            return listFilesUtil.getNewFileDescriptions(filesInDB, filesInWorkFolder);
 
         return null;
     }
 
     @Override
     public void saveNewFiles(List<FileDescription> newFiles) {
-        for (FileDescription fileDescription : newFiles) {
+        for (FileDescription fileDescription : newFiles)
             fileDataRepository.save(fileDescription);
-        }
     }
 
     @Override
@@ -100,6 +112,18 @@ public class CostServiceImpl implements CostService {
 
     @Override
     public List<File> getAllFilesFromWorkFolder() {
-        return Arrays.asList(fUtil.getfList());
+        return Arrays.asList(listFilesUtil.getfList());
+    }
+
+    @Override
+    public CostStructure saveCostsFromCostStructure(CostStructure costStructure) {
+        Set<Cost> costs = costStructure.getCosts();
+        Set<Cost> newCosts = new HashSet<>();
+        for (Cost cost : costs)
+            newCosts.add(costRepository.save(cost));
+
+        costStructure.setCosts(newCosts);
+
+        return costStructure;
     }
 }

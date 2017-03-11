@@ -13,17 +13,17 @@ import ua.nick.milkcost.service.CostService;
 
 import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
-import java.time.YearMonth;
+import java.util.Date;
 import java.util.List;
 
 @Controller
 public class ApplicationController {
 
     @Autowired
-    CostService costService;
+    private CostService costService;
 
     @RequestMapping(value = {"/", "/welcome"}, method = RequestMethod.GET)
-    public String welcome(@ModelAttribute("message") String message, Model model, Principal principal) {
+    public String welcome(@ModelAttribute("message") String message, Model model) {
 
         if (message.equals(""))
             message = null;
@@ -42,7 +42,7 @@ public class ApplicationController {
             model.addAttribute("message", "There are no new files in work folder");
         else
             costService.createCostStructures(newFiles);
-            //model.addAttribute("message", "Costs " + newCostStructure.getMonthYear() + " was added");
+            model.addAttribute("message", "New files was added to data base");
 
         return "welcome";
     }
@@ -53,8 +53,8 @@ public class ApplicationController {
         String typeCostsStr = req.getParameter("type");
         TypeCosts typeCosts = costService.findTypeCostsByString(typeCostsStr);
 
-        String monthYearStr = req.getParameter("period");
-        YearMonth period = costService.getYearMonthFromString(monthYearStr);
+        String text = req.getParameter("period");
+        Date period = costService.getDateFromString(text);
 
         //need this or not?
         if (typeCosts == null || period == null){

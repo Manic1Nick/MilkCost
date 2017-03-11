@@ -28,49 +28,33 @@
 <body>
 <div class="container">
 
-    <script>
-        $(document).ready(function(){
-            $('[data-toggle="tooltip"]').tooltip();
-        });
-    </script>
-
-    <c:if test="${pageContext.request.userPrincipal.name != null}">
-
-        <%--ALERT MESSAGE--%>
-        <c:if test="${message != null}">
-            <div class="alert alert-success">
-                <h4><a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
-                    <strong>${message}</strong></h4>
-            </div>
-        </c:if>
-
-        <%--LOGOUT--%>
-        <form id="logoutForm" method="POST" action="${contextPath}/logout">
-            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
-        </form>
-        <a onclick="document.forms['logoutForm'].submit()">Logout</a>
-
-        <%--ADD NEW DATA--%>
-        <p>
-            <a href="${contextPath}/costs/add">Add new data</a>
-        </p>
-
-        <%--SHOW TOTAL COSTS--%>
-        <p>
-            <a href="${contextPath}/costs/get?type=TOTAL">Show total costs</a>
-        </p>
-
-        <%--SHOW DIRECT COSTS--%>
-        <p>
-            <a href="${contextPath}/costs/get?type=DIRECT">Show direct costs</a>
-        </p>
-
-        <%--SHOW OVERHEAD COSTS--%>
-        <p>
-            <a href="${contextPath}/costs/get?type=OVERHEAD">Show overhead costs</a>
-        </p>
-
+    <%--ALERT MESSAGE--%>
+    <c:if test="${message != null}">
+        <div class="alert alert-success">
+            <h4><a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                <strong>${message}</strong></h4>
+        </div>
     </c:if>
+
+    <%--ADD NEW DATA--%>
+    <p>
+        <a href="${contextPath}/costs/add">Add new data</a>
+    </p>
+
+    <%--SHOW TOTAL COSTS--%>
+    <p>
+        <a href="${contextPath}/costs/get?type=TOTAL">Show total costs</a>
+    </p>
+
+    <%--SHOW DIRECT COSTS--%>
+    <p>
+        <a href="${contextPath}/costs/get?type=DIRECT">Show direct costs</a>
+    </p>
+
+    <%--SHOW OVERHEAD COSTS--%>
+    <p>
+        <a href="${contextPath}/costs/get?type=OVERHEAD">Show overhead costs</a>
+    </p>
 
 </div>
 <!-- /container -->

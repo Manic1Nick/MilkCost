@@ -7,10 +7,10 @@ public final class Constants {
     //take accounts and indicators
     //accounts for report
     public static final String ACCOUNTS_PROPERTY_EXCEL_FILE_LOCATION_PATH =
-            "/home/jessy/IdeaProjects/data_xls/accounts_property.xls";
+            "/home/jessy/IdeaProjects/MilkCost/files/accounts_property.xls";
     //indicators what we want get
     public static final String INDICATORS_EXCEL_FILE_LOCATION_PATH =
-            "/home/jessy/IdeaProjects/data_xls/indicators_test.xls";
+            "/home/jessy/IdeaProjects/MilkCost/indicators_test.xls";
 
     //read costs
     //direct costs
@@ -28,5 +28,5 @@ public final class Constants {
             "/home/jessy/IdeaProjects/data_xls/result_2016_10.xls";
 
     public static final String FOLDER_WITH_FILES_FOR_MILK_COST =
-            "/home/jessy/IdeaProjects/data_xls";
+            "/home/jessy/IdeaProjects/MilkCost/files";
 }

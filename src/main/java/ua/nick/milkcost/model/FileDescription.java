@@ -1,8 +1,6 @@
 package ua.nick.milkcost.model;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.io.File;
 import java.util.Date;
 
@@ -10,6 +8,7 @@ import java.util.Date;
 @Table(name = "files")
 public class FileDescription {
 
+    private Long id;
     private String fileName;
     private TypeCosts typeCosts;
     private Date dateOfLastChange;
@@ -28,13 +27,13 @@ public class FileDescription {
     public FileDescription(File file) {
         if (file.isFile()) {
             this.fileName = file.getName();
-            this.typeCosts = getTypeCostsOfFile();
+            this.typeCosts = determineTypeCostsOfFile();
             this.dateOfLastChange = new Date(file.lastModified());
             this.file = file;
         }
     }
 
-    public TypeCosts getTypeCostsOfFile() {
+    public TypeCosts determineTypeCostsOfFile() {
         if (fileName.toLowerCase().contains("direct"))
             return TypeCosts.DIRECT;
         else if (fileName.toLowerCase().contains("overhead"))
@@ -46,6 +45,15 @@ public class FileDescription {
     }
 
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
     public String getFileName() {
         return fileName;
     }
@@ -62,6 +70,7 @@ public class FileDescription {
         this.typeCosts = typeCosts;
     }
 
+    @Temporal(TemporalType.TIMESTAMP)
     public Date getDateOfLastChange() {
         return dateOfLastChange;
     }
