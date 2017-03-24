@@ -2,7 +2,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <c:set var="contextPath" value="${pageContext.request.contextPath}"/>
-<c:set var="user" value="${currentUser}"/>
+<c:set var="periods" value="${periods}"/>
 <c:set var="message" value="${message}"/>
 
 <!DOCTYPE html>
@@ -18,6 +18,14 @@
     <title>Welcome</title>
 
     <link href="${contextPath}/resources/css/bootstrap.min.css" rel="stylesheet">
+
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.12/css/dataTables.bootstrap.min.css" rel="stylesheet"/>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.12/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.12/js/dataTables.bootstrap.min.js"></script>
+
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
@@ -38,23 +46,58 @@
 
     <%--ADD NEW DATA--%>
     <p>
-        <a href="${contextPath}/costs/add">Add new data</a>
+        <a href="${contextPath}/costs/add">Add data from new files</a>
     </p>
 
-    <%--SHOW TOTAL COSTS--%>
+    <%--UPDATE DB--%>
     <p>
-        <a href="${contextPath}/costs/get?type=TOTAL">Show total costs</a>
+        <a href="${contextPath}/costs/update/database">Update database</a>
     </p>
 
-    <%--SHOW DIRECT COSTS--%>
-    <p>
-        <a href="${contextPath}/costs/get?type=DIRECT">Show direct costs</a>
-    </p>
 
-    <%--SHOW OVERHEAD COSTS--%>
-    <p>
-        <a href="${contextPath}/costs/get?type=OVERHEAD">Show overhead costs</a>
-    </p>
+    <%--PERIODS--%>
+        <h2>Available periods:</h2>
+
+        <table id="orders" class="table table-striped table-bordered table-hover" cellspacing="0" width="100%">
+            <thead>
+            <tr>
+                <th>Select Years:</th>
+                <th>Select Month:</th>
+                <th>Changed</th>
+                <th id="sendCostsCompare"><a href="#">Compare 2 periods</a></th>
+            </tr>
+            </thead>
+
+            <tbody>
+            <form id="costsCompare" name="input" action="${contextPath}/costs/compare" method="get">
+
+            <c:forEach items="${periods}" var="period">
+                <tr>
+                    <td><a href="${contextPath}/costs/get/all?year=${period.year}">
+                        <c:out value="${period.year}" /></a>
+                    </td>
+                    <td><a href="${contextPath}/costs/get/one?period=${period.year}-${period.month}">
+                        <c:out value="${period.monthName}" /></a>
+                    </td>
+                    <td>
+                        <c:if test="${period.updated == true}">
+                            <strong>NEW!</strong>
+                        </c:if>
+                        <c:if test="${period.updated == false}">
+                            not changed
+                        </c:if>
+                    </td>
+                    <td>
+                        <div class="checkbox">
+                            <label><input type="checkbox" name="comparingCosts" value="${period.id}" /></label>
+                        </div>
+                    </td>
+                </tr>
+            </c:forEach>
+
+            </form>
+            </tbody>
+        </table>
 
 </div>
 <!-- /container -->
@@ -62,3 +105,10 @@
 <script src="${contextPath}/resources/js/bootstrap.min.js"></script>
 </body>
 </html>
+<script>
+    var form = document.getElementById("costsCompare");
+
+    document.getElementById("sendCostsCompare").addEventListener("click", function () {
+        form.submit();
+    });
+</script>

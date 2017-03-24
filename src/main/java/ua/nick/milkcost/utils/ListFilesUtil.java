@@ -2,7 +2,7 @@ package ua.nick.milkcost.utils;
 
 import org.springframework.stereotype.Component;
 import ua.nick.milkcost.model.Constants;
-import ua.nick.milkcost.model.FileDescription;
+import ua.nick.milkcost.model.FileCost;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -83,16 +83,16 @@ public class ListFilesUtil {
         return newFileDescriptions;
     }*/
 
-	public List<FileDescription> getNewFileDescriptions(
-				List<FileDescription> filesInDB, List<File> filesInFolder) { //filesInFolder.size() > 0 !
-		List<FileDescription> newDbFiles = new ArrayList<>();
+	public List<FileCost> getNewFileCosts(
+            List<FileCost> filesInDB, List<File> filesInFolder) { //filesInFolder.size() > 0 !
+		List<FileCost> newDbFiles = new ArrayList<>();
 
 		if (filesInDB.size() == 0) {
             newDbFiles = filesInFolder.stream()
-                    .map(file -> new FileDescription(file)).collect(Collectors.toList());
+                    .map(file -> new FileCost(file)).collect(Collectors.toList());
         } else {
             for (File file : filesInFolder) { //filesInDB.size() > 0 !
-                FileDescription newDbFile = createNewDbFile(filesInDB, file);
+                FileCost newDbFile = createNewDbFile(filesInDB, file);
                 if (newDbFile != null)
                     newDbFiles.add(newDbFile);
             }
@@ -100,8 +100,8 @@ public class ListFilesUtil {
 		return newDbFiles;
     }
 
-    private FileDescription createNewDbFile(List<FileDescription> filesInDB, File file) {
-        FileDescription fileInDB = filesInDB.stream()
+    private FileCost createNewDbFile(List<FileCost> filesInDB, File file) {
+        FileCost fileInDB = filesInDB.stream()
                 .filter(f -> f.getFile().getName().equals(file.getName())).findAny().orElse(null);
 		if (fileInDB != null) {
 			Date newFileDateModified = new Date(file.lastModified());
@@ -110,7 +110,7 @@ public class ListFilesUtil {
 			if (!newFileDateModified.after(dbFileDateModified))
 				return null;
 		}
-		return new FileDescription(file);
+		return new FileCost(file);
     }
 
     //test
