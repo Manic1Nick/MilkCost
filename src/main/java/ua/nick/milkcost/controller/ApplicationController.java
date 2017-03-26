@@ -24,15 +24,43 @@ public class ApplicationController {
     @RequestMapping(value = {"/", "/welcome"}, method = RequestMethod.GET)
     public String welcome(@ModelAttribute("message") String message, Model model) {
 
-        if (message.equals(""))
-            message = null;
+        model.addAttribute("message", message);
+
+        return "welcome";
+    }
+
+    @RequestMapping(value = {"/show/periods/all"}, method = RequestMethod.GET)
+    public String showAllPeriods(@ModelAttribute("message") String message, Model model) {
 
         model.addAttribute("message", message);
 
         List<Period> periods = costService.getAllPeriodsFromDB();
         model.addAttribute("periods", sortListPeriods(periods));
 
-        return "welcome";
+        return "periods";
+    }
+
+    @RequestMapping(value = {"/show/periods"}, method = RequestMethod.GET)
+    public String showPeriodsByMonths(@ModelAttribute("message") String message,
+                                      Model model, HttpServletRequest req) {
+
+        String text = req.getParameter("months");
+        List<Period> periods;
+        if (text.equals("all")) {
+            periods = sortListPeriods(costService.getAllPeriodsFromDB());
+
+        } else if (text.equals("currentYear")) {
+            periods = sortListPeriods(costService.getPeriodsOfCurrentYear());
+
+        } else {
+            int months = Integer.parseInt(text);
+            periods = costService.getPeriodsByLastMonths(months);
+        }
+
+        model.addAttribute("message", checkPeriodsInRequest(periods, text));
+        model.addAttribute("periods", sortListPeriods(periods));
+
+        return "periods";
     }
 
     @RequestMapping(value = "/costs/add", method = RequestMethod.GET)
@@ -46,10 +74,6 @@ public class ApplicationController {
             costService.saveNewCosts(newFiles);
             model.addAttribute("message", "New files was added to data base");
         }
-
-        List<Period> periods = costService.getAllPeriodsFromDB();
-        model.addAttribute("periods", sortListPeriods(periods));
-
         return "welcome";
     }
 
@@ -148,10 +172,6 @@ public class ApplicationController {
             costService.saveNewCostsForUpdateDB(newFiles);
             model.addAttribute("message", "New files for update BD was added to data base");
         }
-
-        List<Period> periods = costService.getAllPeriodsFromDB();
-        model.addAttribute("periods", sortListPeriods(periods));
-
         return "welcome";
     }
 
@@ -160,11 +180,6 @@ public class ApplicationController {
             throws IOException {
 
         String[] textPeriodIds = req.getParameterValues("comparingCosts");
-
-        if (textPeriodIds == null || textPeriodIds.length != 2) {
-            model.addAttribute("message", checkCostsCompare(textPeriodIds));
-            return "redirect:/welcome";
-        }
 
         Map<String, Map<String, Double>> mapCosts = new HashMap<>();
         for (String text : textPeriodIds) {
@@ -181,7 +196,7 @@ public class ApplicationController {
         model.addAttribute("previous", new Gson().toJson(mapCosts.get(periods.get(1)).values()));
         model.addAttribute("next", new Gson().toJson(mapCosts.get(periods.get(0)).values()));
 
-        return "costs_compare2";
+        return "costs_compare";
     }
 
     @RequestMapping(value = "/cost/history", method = RequestMethod.GET)
@@ -244,14 +259,11 @@ public class ApplicationController {
         return periods;
     }
 
-    private String checkCostsCompare(String[] textPeriodIds) {
-        String message = "";
+    private String checkPeriodsInRequest(List<Period> periods, String text) {
+        String message = null;
 
-        if (textPeriodIds == null || textPeriodIds.length == 0)
-            message = "No selected periods";
-
-        else if (textPeriodIds.length != 2)
-            message = "Please select only 2 periods for compare";
+        if (periods == null || periods.size() == 0)
+            message = "Some of requested last periods are missing in the database yet";
 
         return message;
     }

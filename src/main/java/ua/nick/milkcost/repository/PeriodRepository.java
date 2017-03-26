@@ -12,3 +12,4 @@ public interface PeriodRepository extends JpaRepository<Period, Long> {
     List<Period> findByMonth(String month);
     Period findByYearAndMonth(String year, String month);
 }
+

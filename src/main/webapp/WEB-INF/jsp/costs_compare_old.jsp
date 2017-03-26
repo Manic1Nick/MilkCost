@@ -82,86 +82,62 @@
 </script>
 <script>
 
-    zingchart.MODULESDIR = "https://cdn.zingchart.com/modules/";
-    var myConfig = {
-        "type":"bullet",
-        "title":{
-            "text":"Cost Compare",
-            "background-color":"none",
-            "color":"#333"
-        },
-        "plotarea":{
+    zingchart.MODULESDIR = "https://cdn.zingchart.com/modules/"; // set modules dir
+    zingchart.loadModules('dragging'); // load dragging module
 
+    var myConfig = { // chart configuration
+        type: 'vbullet',
+        title: {
+            text: 'Costs Compare'
         },
-        "scaleX":{
-            "guide":{
-                "visible":false
-            },
-            "label":["Costs"],
-            "values":[
+        subtitle: {
+            text: 'Bars are draggable'
+        },
+        scaleX: {
+            labels: [
                 <c:forEach var="name" items="${names}" varStatus="status">
                     "${name}"<c:if test="${!status.last}"> ,</c:if>
                 </c:forEach>
-            ],
-            "tick":{
-                "line-color":"#333"
-            },
-            "line-color":"#666",
-            "item":{
-                "wrapText":true,
-                "color":"#333"
-            }
+            ]
         },
-        "scaleY":{
-            "tick":{
-                "line-color":"#333"
-            },
-            "line-color":"#333",
-            "guide":{
-                "lineStyle":"solid"
-            },
-            "item":{
-                "wrapText":true,
-                "color":"#333"
-            },
-            "short":true,
-            "thousands-separator":","
+        tooltip: { // tooltip changes based on value
+            fontSize: 14,
+            borderRadius: 3,
+            borderWidth: 0,
+            shadow: true
         },
-        "plot":{
-            "tooltip":{
-                "fontSize":15,
-                "align":"left",
-                "borderRadius":3,
-                "borderWidth":2,
-                "borderColor":"%color-1",
-                "backgroundColor":"#fff",
-                "shadow":0,
-                "alpha":0.9,
-                "padding":10,
-                "color":"#000",
-                "negation":"currency",
-                "thousandsSeparator":",",
-                "text":"<b style=\"color:%color\">Current: %node-value</b> UAH<br><em style=\"color:#C4473F\">Previous: %g</em> UAH",
-            },
-            "goal":{
-                "background-color":"#C4473F"
-            }
+        plot : {
+            valueBox:[
+                {
+                    type : 'all',
+                    color : '#000',
+                    placement : 'goal',
+                    text: '[%node-value / %node-goal-value]'
+                }
+            ]
         },
-        "series":[
+        series : [
             {
-                "values":${next},
-                "goals":${previous},
+                dataDragging : true, // need this to enable drag
+                values:
+                    ${next},
+                goals:
+                    ${previous},
+                goal:{
+                    backgroundColor: '#64b5f6',
+                    borderWidth: 0
+                },
                 rules:[ // rules for color
                     {
-                        rule: '%v > %g/0.9', // if greater than goal
-                        backgroundColor: '#ef5350'
-                    },
-                    {
-                        rule: '%v < %g/0.9 && %v > %g/1.1', // if less than half goal
+                        rule: '%v >= %g', // if greater than goal
                         backgroundColor: '#ffca28'
                     },
                     {
-                        rule: '%v < %g/1.1', // if in between
+                        rule: '%v < %g/2', // if less than half goal
+                        backgroundColor: '#ef5350'
+                    },
+                    {
+                        rule: '%v >= %g/2 && %v < %g', // if in between
                         backgroundColor: '#81c784'
                     }
                 ]
@@ -173,15 +149,22 @@
         id : 'myChart',
         data : myConfig,
         height: 500,
-        width: 725
+        width: '100%',
+        modules : "dragging" // need this to enable drag
     });
-
-
 
 </script>
 <style type="text/css">
-    .zc-ref {
-        display: none;
+    html, body {
+        height:100%;
+        width:100%;
+        margin:0;
+        padding:0;
+    }
+    #myChart {
+        height:100%;
+        width:100%;
+        min-height:150px;
     }
 </style>
 

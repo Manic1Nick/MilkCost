@@ -3,16 +3,12 @@ package ua.nick.milkcost.service;
 import ua.nick.milkcost.model.*;
 
 import java.io.File;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 public interface CostService {
 
     List<FileCost> saveNewCosts(List<FileCost> newFiles);
-
-    TypeCosts findTypeCostsByString(String typeStr);
-    Date getDateFromString(String date);
 
     List<FileCost> getNewFiles();
     void saveNewFiles(List<FileCost> newFiles);
@@ -24,6 +20,8 @@ public interface CostService {
     List<FileCost> saveNewCostsForUpdateDB(List<FileCost> newFiles);
 
     List<Period> getAllPeriodsFromDB();
+    List<Period> getPeriodsOfCurrentYear();
+    List<Period> getPeriodsByLastMonths(int months);
 
     Cost saveNewCost(Cost cost);
     void saveCostsFromFiles(List<FileCost> newFiles);

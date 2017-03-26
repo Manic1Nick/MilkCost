@@ -6,11 +6,11 @@ import ua.nick.milkcost.model.*;
 import ua.nick.milkcost.repository.CostRepository;
 import ua.nick.milkcost.repository.FileCostRepository;
 import ua.nick.milkcost.repository.PeriodRepository;
-import ua.nick.milkcost.utils.DateUtil;
 import ua.nick.milkcost.utils.ListFilesUtil;
 import ua.nick.milkcost.utils.ReadExcelFileUtil;
 
 import java.io.File;
+import java.time.YearMonth;
 import java.util.*;
 
 @Service(value = "service")
@@ -24,9 +24,6 @@ public class CostServiceImpl implements CostService {
 
     @Autowired
     private PeriodRepository periodRepository;
-
-    @Autowired
-    private DateUtil dateUtil;
 
     @Autowired
     private ListFilesUtil listFilesUtil;
@@ -45,20 +42,6 @@ public class CostServiceImpl implements CostService {
         saveCostsFromFiles(files);
 
         return files;
-    }
-
-    @Override
-    public TypeCosts findTypeCostsByString(String typeStr) {
-        for (TypeCosts typeCosts : Arrays.asList(TypeCosts.values()))
-            if (typeStr.equals(typeCosts.toString()))
-                return typeCosts;
-
-        return null;
-    }
-
-    @Override
-    public Date getDateFromString(String date) {
-        return dateUtil.getDateFromString(date);
     }
 
     @Override
@@ -141,6 +124,105 @@ public class CostServiceImpl implements CostService {
     @Override
     public List<Period> getAllPeriodsFromDB() {
         return periodRepository.findAll();
+    }
+
+    @Override
+    public List<Period> getPeriodsOfCurrentYear() {
+        int currentYear = YearMonth.now().getYear();
+
+        return periodRepository.findByYear(String.valueOf(currentYear));
+    }
+
+    @Override
+    public List<Period> getPeriodsByLastMonths(int months) {
+        List<Period> periods = new ArrayList<>();
+
+        if (months == 1)
+            periods = getPeriodsOfLastAvailableMonth();
+
+        else if (months == 3)
+            periods = getPeriodsOfLastAvailableQuartile();
+
+        else if (months == 12)
+            periods = getPeriodsOfLastAvailableYear();
+
+        /*YearMonth currentMonth = YearMonth.now();
+
+        while (periods.size() < months) {
+            currentMonth = currentMonth.minusMonths(1);
+
+            String year = String.valueOf(currentMonth.getYear());
+            String month = String.valueOf(currentMonth.getMonthValue());
+            month = month.length() < 2 ? "0" + month : month ;
+            Period nextPreviousPeriod = periodRepository.findByYearAndMonth(year, month);
+
+            if (nextPreviousPeriod != null)
+                periods.add(nextPreviousPeriod);
+        }*/
+        //periods.removeAll(Collections.singleton(null));//remove all nulls
+
+        return periods;
+    }
+
+    private List<Period> getPeriodsOfLastAvailableMonth() {
+        List<Period> periods = new ArrayList<>();
+
+        int currentYear = YearMonth.now().getYear();
+        int currentMonth = YearMonth.now().getMonthValue();
+
+        while (periods.size() < 1) {
+            Period period = getPeriodByCurrentYearAndMonth(currentYear, currentMonth--);
+
+            if (period != null)
+                periods.add(period);
+        }
+        return periods;
+    }
+
+    private List<Period> getPeriodsOfLastAvailableQuartile() {
+        List<Period> periods = new ArrayList<>(3);
+
+        int currentYear = YearMonth.now().getYear();
+        int currentMonth = YearMonth.now().getMonthValue();
+
+        while ((12 - currentMonth) / 3 != 0) {
+            currentMonth--;
+            if (currentMonth == 0) {
+                currentMonth = 12;
+                currentYear--;
+            }
+        }
+        while (periods.size() < 3) {
+            Period period = getPeriodByCurrentYearAndMonth(currentYear, currentMonth--);
+
+            if (period != null)
+                periods.add(period);
+        }
+        return periods;
+    }
+
+    private List<Period> getPeriodsOfLastAvailableYear() {
+        int currentYear = YearMonth.now().getYear();
+
+        List<Period> periods = new ArrayList<>();
+        while (periods.size() < 12)
+            periods = periodRepository.findByYear(String.valueOf(currentYear--));
+
+        return periods;
+    }
+
+    private Period getPeriodByCurrentYearAndMonth(int currentYear, int currentMonth) {
+
+        if (currentMonth == 0) {
+            currentMonth = 12;
+            currentYear--;
+        }
+        String month = String.valueOf(currentMonth);
+        month = month.length() < 2 ? "0" + month : month ;
+
+        return periodRepository.findByYearAndMonth(
+                String.valueOf(currentYear),
+                String.valueOf(month));
     }
 
     @Override
