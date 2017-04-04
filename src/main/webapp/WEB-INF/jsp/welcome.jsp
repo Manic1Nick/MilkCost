@@ -32,7 +32,6 @@
 </head>
 
 <body>
-
 <div class="container">
 
     <%--ALERT MESSAGE--%>
@@ -44,7 +43,7 @@
     </c:if>
 
     <p style="text-align:center;">
-        <img src="${contextPath}/resources/images/the-true-cost-of-milk-img1.png"
+        <img src="${contextPath}/resources/images/the-true-cost-of-milk-img2.png"
              style="max-width:50%; max-height:50%;">
     </p>
 
@@ -58,7 +57,7 @@
 
     <%--ADD NEW DATA--%>
     <h5 class="text-center">
-        <a href="${contextPath}/costs/add"
+        <a href="#" onclick="addNewCosts()"
            data-toggle="tooltip" title="If you want add new periods to database">
                 Add data from new files
         </a>
@@ -66,7 +65,7 @@
 
     <%--UPDATE DB--%>
     <h5 class="text-center">
-        <a href="${contextPath}/costs/update/database"
+        <a href="#" onclick="updateDatabase()"
             data-toggle="tooltip" title="If you want update all periods in database">
                 Update database
         </a>
@@ -109,6 +108,24 @@
         </div>
     </div>
 
+        <%--MODAL add & update--%>
+        <div class="modal fade" id="openModal" role="dialog">
+            <div class="modal-dialog modal-sm">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title" id="modalName"><%--content--%></h4>
+                    </div>
+                    <div class="modal-body" id="modalData">
+                        <p><strong><%--content--%></strong></p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
 </div>
 </body>
 </html>
@@ -116,7 +133,38 @@
     function openSelectPeriodModal() {
         $("#openModalPeriodSelect").modal('show');
     }
+
     function selectPeriod(months) {
         window.location.assign("${contextPath}/show/periods?months=" + months);
+    }
+
+    function addNewCosts() {
+        $.ajax({
+            url: '${contextPath}/costs/add',
+            type: 'GET'
+        }).success(function (resp) {
+            $("#modalName").html("Adding costs info:");
+            $("#modalData").html(resp);
+            $("#openModal").modal('show');
+        }).error(function (resp) {
+            $("#modalName").html("ERROR:");
+            $("#modalData").html("Error adding costs");
+            $("#openModal").modal('show');
+        })
+    }
+
+    function updateDatabase() {
+        $.ajax({
+            url: '${contextPath}/costs/update/database',
+            type: 'GET'
+        }).success(function (resp) {
+            $("#modalName").html("Update database info:");
+            $("#modalData").html(resp);
+            $("#openModal").modal('show');
+        }).error(function (resp) {
+            $("#modalName").html("ERROR:");
+            $("#modalData").html("Error updating database");
+            $("#openModal").modal('show');
+        })
     }
 </script>

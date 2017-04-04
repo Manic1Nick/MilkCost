@@ -64,17 +64,18 @@ public class ApplicationController {
     }
 
     @RequestMapping(value = "/costs/add", method = RequestMethod.GET)
-    public String addNewCosts(@ModelAttribute("message") String message, Model model) {
+    public void addNewCosts(@ModelAttribute("message") String message,
+                            HttpServletResponse resp, Model model) throws IOException {
 
         //check new files in work folder
         List<FileCost> newFiles = costService.getNewFiles();
         if (newFiles == null || newFiles.size() == 0) {
-            model.addAttribute("message", "There are no new files in work folder");
+            message = "There are no new files in work folder";
         } else {
             costService.saveNewCosts(newFiles);
-            model.addAttribute("message", "New files was added to data base");
+            message = "New files was added to data base";
         }
-        return "welcome";
+        resp.getWriter().print(message);
     }
 
     @RequestMapping(value = "/costs/get/all", method = RequestMethod.GET)
@@ -161,18 +162,18 @@ public class ApplicationController {
     }
 
     @RequestMapping(value = "/costs/update/database", method = RequestMethod.GET)
-    public String updateDatabase(@ModelAttribute("message") String message, Model model)
-            throws IOException {
+    public void updateDatabase(@ModelAttribute("message") String message,
+                               HttpServletResponse resp, Model model) throws IOException {
 
         //check new files in work folder
         List<FileCost> newFiles = costService.getNewFilesForUpdateDB();
         if (newFiles == null || newFiles.size() == 0) {
-            model.addAttribute("message", "There are no new files for update DB in work folder");
+            message = "There are no new files for update DB in work folder";
         } else {
             costService.saveNewCostsForUpdateDB(newFiles);
-            model.addAttribute("message", "New files for update BD was added to data base");
+            message = "New files for update BD was added to data base";
         }
-        return "welcome";
+        resp.getWriter().print(message);
     }
 
     @RequestMapping(value = "/costs/compare", method = RequestMethod.GET)
